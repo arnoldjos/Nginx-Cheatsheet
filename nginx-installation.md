@@ -47,6 +47,14 @@ Install Compiled source
 make install
 ```
 
+# Nginx Dynamic content
+
+### For Php
+
+```
+apt-get install php-fpm
+```
+
 # Add Nginx as Systemd Service
 
 ## Minimum requirements of Ubuntu 15.0.4 or CENTOS 7.0.0
@@ -82,4 +90,76 @@ systemctl status nginx
 
 ```
 systemctl enable nginx
+```
+
+# NGINX nginx.conf Directives
+
+### Location Blocks
+
+```
+	=  exact match				- First Priority
+	^~ preferential match	- Second Priority
+	~* regex match				- Third Priority
+		 Prefix match       - Last Priority
+
+
+
+	Preferential Prefix match - case sensitive
+	location ^~ /greet2 {
+		return 200 'Hello from NGINX';
+	}
+
+	Exact match - case sensitive
+	location = /greet {
+		return 200 'Hello from NGINX - EXACT MATCH';
+	}
+
+	REGEX match - case sensitive
+	location ~ /greet[0-9] {
+		return 200 'Hello from NGINX - REGEX MATCH';
+	}
+
+	REGEX match - case insensitive
+	location ~* /greet[0-9] {
+		return 200 'Hello from NGINX - REGEX MATCH CASE INSENSITIVE';
+	}
+```
+
+### Variables
+
+```
+	Setting Variables
+	set $variable value;
+```
+
+### Rewrites and Redirects
+
+```
+	Redirects
+	return - takes a status code and string response.
+	return 200 'sample';
+
+	if the return takes a 300 response variant the second parameter can be a uri.
+	return 307 /sample/path;
+
+	Rewrites
+	rewrite - the first parameter is the uri to be rewritten and the second is the rewritten uri.
+	rewrite /original /rewritten
+
+	You can capture a uri segment by enclosing the segment in parenthesis () and access it by $1 for the first captured parameter, $2 for the second and so on.
+	rewrite ^/user/(\w+) /greet/$1;
+
+	Last flag tells nginx to make the current rewirte the last rewrite of the uri.
+	rewrite ^/user/(\w+) /greet/$1 last;
+	rewrite ^/user/(\w+) /thumb.png;
+```
+
+### Try Files
+
+```
+	Can be used in the server or location context.
+
+	try_files check for a resource to respond with in any number of locations relative to the root directory with a final argument results in a rewrite.
+
+	try_files path1 path2 final;
 ```
